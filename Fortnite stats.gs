@@ -27,10 +27,9 @@ var serverStatusDataCell = 'A1';
 var chartsCreatedDataCell = 'A2';
 
 function main(){
-  setupUI();
+  //setupUI(); // now working called by for some reason.
   initializeSpreadsheet();
   var gameStatus = getGamestatusJson(); // API call
-  
   updateServerMessages(gameStatus); // server status and server message displays
   initializeVariables(gameStatus);
   
@@ -61,9 +60,10 @@ function main(){
   // object containing all stats objects for all usernames; e.g. jsons[username] returns stats json for that username
   var jsons = getStatsForAllUsers();
   // if request failed, show alert, halt
-  if(jsons == false){ 
+  if(jsons == false){
     Logger.log('Could not get stats for all users');
-    showAlert('An error has occured', 'Request failed, fortnite username does not exists', 'Please use a different username.');   
+    // not working on trigger for some reason
+    //showAlert('An error has occured', 'Request failed, fortnite username does not exists', 'Please use a different username.');   
     return;
   }
   
