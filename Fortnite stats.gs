@@ -1,19 +1,19 @@
 // This spreadsheet can be used to visualize your forntite statistics, as you play games the data will be automatically updated. 
 // Note, optionally you can add sendChartsToEmails() and sendChartToDiscord() as weekly triggers to recieve reports
-// for that you will need to make a webhook from discord, and publish your chart and include it here, it is optional functionality however.
- 
+// for that you will need to make a webhook from discord, and publish your chart and include it here, it is optional functionality however. 
+
 // Add any number of usernames to the "fortniteUsernames" array and add main() as a time-driven trigger (5 minutes would be a good interval).
-var fortniteUsernames = ['username1', 'username2', 'etc'];
+var fortniteUsernames = ['silver_0_wins', 'rnzop_yt'];
 // Get an api key by direct messaging @Fortnite Stats on discord, with the message !getapikey  visit https://fortnite.y3n.co/ for more details
-var key = 'yourKeyHere';
+var key = 'lRHAOecPCaWpqYfDthSs';
 // Everything else will be set up automatically.
 
 // if the servers status changes emails will be sent to these addresses, you can add as many as you want
-var emailAddresses = ['email1', 'email2', 'etc'];
+var emailAddresses = ['silvermirai@yahoo.com', 'feraru.silviu_m@yahoo.com'];
 // Discord webhook urls, a list of discord webhooks / routes, when server status changes, messages will be sent to these webhooks
-var discordWebhookUrls = ['webhook1', 'webhook2', 'etc'];
+var discordWebhookUrls = ['https://discordapp.com/api/webhooks/438307836586491915/FMWKqVLAykbZkjBvz5yCGeueXMlv_n4u-8aINy0bsoibLxg4dn3Ga7gGO1M3NgZMVQff'];
 // optionally you can publish your charts so it can be sent to you on discord as a weekly report for example, add sendChartToDiscord() as a trigger
-var chartsLink = 'your published chart goes here, if you want to recieve it on discord';
+var chartsLink = 'https://goo.gl/N9jNFG';
 
 // constants
 var entryColumn = 'A';
@@ -27,7 +27,7 @@ var serverStatusDataCell = 'A1';
 var chartsCreatedDataCell = 'A2';
 
 function main(){
-  //setupUI(); // now working called by for some reason.
+  //setupUI(); // not working called by trigger for some reason.
   initializeSpreadsheet();
   var gameStatus = getGamestatusJson(); // API call
   updateServerMessages(gameStatus); // server status and server message displays
@@ -97,7 +97,6 @@ function main(){
   
   initializeCharts(); // create charts if charts don't exist
 }
-
 
 function showAlert(message1, message2, confirmationMessage) {
   // message1: strng; message2: string; confirmationMessage: string
