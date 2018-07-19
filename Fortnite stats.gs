@@ -3,15 +3,15 @@
 // for that you will need to make a webhook from discord, and publish your chart and include it here, it is optional functionality however. 
 
 // Add any number of usernames to the "fortniteUsernames" array and add main() as a time-driven trigger (5 minutes would be a good interval).
-var fortniteUsernames = ['yourUsername', "yourFriend'sUsername"];
+var fortniteUsernames = ['your username', "your friend's username"];
 // Get an api key by direct messaging @Fortnite Stats on discord, with the message !getapikey  visit https://fortnite.y3n.co/ for more details
-var key = 'yourApiKey';
+var key = 'your api key';
 // Everything else will be set up automatically.
 
 // if the servers status changes emails will be sent to these addresses, you can add as many as you want
-var emailAddresses = ['yourEmail', "your friend's email"];
+var emailAddresses = ['your email', 'another email'];
 // Discord webhook urls, a list of discord webhooks / routes, when server status changes, messages will be sent to these webhooks
-var discordWebhookUrls = ['your discord web hook'];
+var discordWebhookUrls = ['your discord webhook'];
 // optionally you can publish your charts so it can be sent to you on discord as a weekly report for example, add sendChartToDiscord() as a trigger
 var chartsLink = 'your published chart link';
 
@@ -89,9 +89,9 @@ function main(){
       createSheet('silver_chart');
       var specialSheet = getSheet('silver_chart');
       // winrate chart
-      createSpecialChart('D1:D', 1, 1, 'Solo Winrate', 1100, 350, 'silver_chart', 'silver_0_wins');
+      createSpecialChart('D:D', 1, 1, 'Solo Winrate', 1100, 350, 'silver_chart', 'silver_0_wins');
       // kpd chart
-      createSpecialChart('F1:F', 18, 1, 'Solo Kpd', 1100, 350, 'silver_chart', 'silver_0_wins');
+      createSpecialChart('F:F', 18, 1, 'Solo Kpd', 1100, 350, 'silver_chart', 'silver_0_wins');
     }
     
     // if there is a change in matches played for the username...
@@ -149,17 +149,17 @@ function initializeCharts(){
   var chartsCreatedCell = sheet.getRange(chartsCreatedDataCell).getValue();
   if(chartsCreatedCell == false){
     // create charts for duo
-    createChart('I1:I', 2, 1, 'Duo Winrate', 805, 250, 'Graphs');
-    createChart('K1:K', 14, 1, 'Duo Kill per Death', 805, 250, 'Graphs');
-    createChart('H1:H', 26, 1, 'Duo Wins', 805, 250, 'Graphs');
-    createChart('J1:J', 38, 1, 'Duo Kills', 805, 250, 'Graphs');
-    createChart('G1:G', 50, 1, 'Duo Matches', 805, 250, 'Graphs');
+    createChart('I:I', 2, 1, 'Duo Winrate', 805, 250, 'Graphs');
+    createChart('K:K', 14, 1, 'Duo Kill per Death', 805, 250, 'Graphs');
+    createChart('H:H', 26, 1, 'Duo Wins', 805, 250, 'Graphs');
+    createChart('J:J', 38, 1, 'Duo Kills', 805, 250, 'Graphs');
+    createChart('G:G', 50, 1, 'Duo Matches', 805, 250, 'Graphs');
     // create charts for solo
-    createChart('D1:D', 2, 9, 'Solo Winrate', 805, 250, 'Graphs');
-    createChart('F1:F', 14, 9, 'Solo Kill per Death', 805, 250, 'Graphs');
-    createChart('C1:C', 26, 9, 'Solo Wins', 805, 250, 'Graphs');
-    createChart('E1:E', 38, 9, 'Solo Kills', 805, 250, 'Graphs');
-    createChart('B1:B', 50, 9, 'Solo Matches', 805, 250,'Graphs');
+    createChart('D:D', 2, 9, 'Solo Winrate', 805, 250, 'Graphs');
+    createChart('F:F', 14, 9, 'Solo Kill per Death', 805, 250, 'Graphs');
+    createChart('C:C', 26, 9, 'Solo Wins', 805, 250, 'Graphs');
+    createChart('E:E', 38, 9, 'Solo Kills', 805, 250, 'Graphs');
+    createChart('B:B', 50, 9, 'Solo Matches', 805, 250,'Graphs');
   }
   sheet.getRange(chartsCreatedDataCell).setValue(true);
 }
