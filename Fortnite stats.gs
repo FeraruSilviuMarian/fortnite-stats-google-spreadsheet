@@ -3,20 +3,19 @@
 // for that you will need to make a webhook from discord, and publish your chart and include it here, it is optional functionality however. 
 
 // Add any number of usernames to the "fortniteUsernames" array and add main() as a time-driven trigger (5 minutes would be a good interval).
-var fortniteUsernames = ['your username', "your friend's username"];
+var fortniteUsernames = ["your fortnite username", "your friend's fortnite username"];
 // Get an api key by direct messaging @Fortnite Stats on discord, with the message !getapikey  visit https://fortnite.y3n.co/ for more details
-var key = 'your api key';
+var key = 'your fortnite api key';
 // Everything else will be set up automatically.
 
 // if the servers status changes emails will be sent to these addresses, you can add as many as you want
-var emailAddresses = ['your email', 'another email'];
+var emailAddresses = ['email1', 'email2'];
 // Discord webhook urls, a list of discord webhooks / routes, when server status changes, messages will be sent to these webhooks
 var discordWebhookUrls = ['your discord webhook'];
 // optionally you can publish your charts so it can be sent to you on discord as a weekly report for example, add sendChartToDiscord() as a trigger
-var chartsLink = 'your published chart link';
+var chartsLink = 'your published charts link';
 
 // constants
-var varSheetName = 'Variables';
 var entryColumn = 'A';
 var soloMatchesColumn = 'B';
 var duoMatchesColumn = 'G';
@@ -26,9 +25,9 @@ var serverStatusRange = 'D1:E1';
 var serverMessageRange = 'F1:H1';
 var serverStatusDataCell = 'A1';
 var chartsCreatedDataCell = 'A2';
-var lastRowNumberDataCell = 'A3';
 
 function main(){
+  //setupUI(); // not working called by trigger for some reason.
   initializeSpreadsheet();
   var gameStatus = getGamestatusJson(); // API call
   updateServerMessages(gameStatus); // server status and server message displays
@@ -51,7 +50,7 @@ function main(){
       sendDiscordMessage(discordUrl, discordMessage);
     }
     
-    getSheet(varSheetName).getRange(serverStatusDataCell).setValue(gameStatus.status); // update server status data cell
+    getSheet('Variables').getRange(serverStatusDataCell).setValue(gameStatus.status); // update server status data cell
   }
 
   if (!isServerUp(gameStatus)){ // if fortnite servers are down, don't do anything further (prevents unnecesary API calls)
@@ -83,32 +82,30 @@ function main(){
       }
     }
     
-    // create special graph sheet if it doesn't exist note this if statement and createSpecialChart function can be removed safely
-    // it's used to create special charts for myself, you can do something similar too using your username
-    if(!sheetExists('silver_chart')){
-      createSheet('silver_chart');
-      var specialSheet = getSheet('silver_chart');
-      // winrate chart
-      createSpecialChart('D:D', 1, 1, 'Solo Winrate', 1100, 350, 'silver_chart', 'silver_0_wins');
-      // kpd chart
-      createSpecialChart('F:F', 18, 1, 'Solo Kpd', 1100, 350, 'silver_chart', 'silver_0_wins');
-    }
-    
     // if there is a change in matches played for the username...
     if(playedNewMatch(ftnStatsJson, ftnUserName)){
       // append a row for all users
       for(var i = 0; i < fortniteUsernames.length; i++){
         var username = fortniteUsernames[i];
-        var statsJson = jsons[username];
+        var statsJson = jsons[username]
         insertStatsRow(username, statsJson);
       }
-      incrementLastRowVar();
     }
+  }
+  
+  // create special graph sheet if it doesn't exist note this if statement and createSpecialChart function can be removed safely
+  // it's used to create special charts for myself, you can do something similar too using your username
+  if(!sheetExists('silver_chart')){
+    createSheet('silver_chart');
+    var specialSheet = getSheet('silver_chart');
+    // winrate chart
+    createSpecialChart('D:D', 1, 1, 'Solo Winrate', 1100, 350, 'silver_chart', 'silver_0_wins');
+    // kpd chart
+    createSpecialChart('F:F', 18, 1, 'Solo Kpd', 1100, 350, 'silver_chart', 'silver_0_wins');
   }
   
   initializeCharts(); // create charts if charts don't exist
 }
-
 
 function createSpecialChart(range, x, y, title, width, height, graphSheet, dataSheet){
   // range: string; x: int; y: int; title: string; width: int; height; int; graphSheet: string; dataSheet: string
@@ -129,45 +126,31 @@ function createSpecialChart(range, x, y, title, width, height, graphSheet, dataS
   sheet.updateChart(chart);    
 }
 
-function incrementLastRowVar(){
-  var varSheet = getSheet(varSheetName);
-  var lastRowNumber = parseInt(varSheet.getRange(lastRowNumberDataCell).getValue());
-  Logger.log(lastRowNumber);
-  varSheet.getRange(lastRowNumberDataCell).setValue(lastRowNumber + 1);
-}
-
-function sendChartToDiscord(){
-    for(var i = 0; i < discordWebhookUrls.length; i++){
-      var discordWebhook = discordWebhookUrls[i];
-      sendDiscordMessage(discordWebhook, chartsLink);
-    }
-}
-
 function initializeCharts(){
-  // if charts doesn't exists, creates charts
-  var sheet = getSheet(varSheetName);
+  // if charts don't exist, creates charts
+  var sheet = getSheet('Variables');
   var chartsCreatedCell = sheet.getRange(chartsCreatedDataCell).getValue();
   if(chartsCreatedCell == false){
     // create charts for duo
-    createChart('I:I', 2, 1, 'Duo Winrate', 805, 250, 'Graphs');
-    createChart('K:K', 14, 1, 'Duo Kill per Death', 805, 250, 'Graphs');
-    createChart('H:H', 26, 1, 'Duo Wins', 805, 250, 'Graphs');
-    createChart('J:J', 38, 1, 'Duo Kills', 805, 250, 'Graphs');
-    createChart('G:G', 50, 1, 'Duo Matches', 805, 250, 'Graphs');
+    createChart('I:I', 2, 1, 'Duo Winrate', 805, 250);
+    createChart('K:K', 14, 1, 'Duo Kill per Death', 805, 250);
+    createChart('H:H', 26, 1, 'Duo Wins', 805, 250);
+    createChart('J:J', 38, 1, 'Duo Kills', 805, 250);
+    createChart('G:G', 50, 1, 'Duo Matches', 805, 250);
     // create charts for solo
-    createChart('D:D', 2, 9, 'Solo Winrate', 805, 250, 'Graphs');
-    createChart('F:F', 14, 9, 'Solo Kill per Death', 805, 250, 'Graphs');
-    createChart('C:C', 26, 9, 'Solo Wins', 805, 250, 'Graphs');
-    createChart('E:E', 38, 9, 'Solo Kills', 805, 250, 'Graphs');
-    createChart('B:B', 50, 9, 'Solo Matches', 805, 250,'Graphs');
+    createChart('D:D', 2, 9, 'Solo Winrate', 805, 250);
+    createChart('F:F', 14, 9, 'Solo Kill per Death', 805, 250);
+    createChart('C:C', 26, 9, 'Solo Wins', 805, 250);
+    createChart('E:E', 38, 9, 'Solo Kills', 805, 250);
+    createChart('B:B', 50, 9, 'Solo Matches', 805, 250);    
   }
   sheet.getRange(chartsCreatedDataCell).setValue(true);
 }
 
-function createChart(range, x, y, title, width, height, sheetName){
+function createChart(range, x, y, title, width, height){
   // range: string; x: int; y: int; title: string; width: int; height; int
   // Creates a chart with data from all usernames for a given range at x row, y column, with a title, a width and height
-  var sheet = getSheet(sheetName);
+  var sheet = getSheet('Graphs');
   // chart setup
   var chart = sheet.newChart()
   .setChartType(Charts.ChartType.LINE)
@@ -200,15 +183,31 @@ function getStatsForAllUsers(){
   return jsons;
 }
 
+function sendDiscordMessage(webhookUrl, message){
+  var data = {
+    'content' : message
+  }
+  var options = {
+    'method' : 'POST',
+    'headers': {'Content-Type': 'application/json'},
+    'payload': JSON.stringify(data)
+  };
+  UrlFetchApp.fetch(webhookUrl, options);
+}
+
+function sendEmail(emailAddress, subject, message){
+  MailApp.sendEmail(emailAddress, subject, message);
+}
+
 function serverStatusChanged(gameStatus){
-  var lastServerStatus = getSheet(varSheetName).getRange(serverStatusDataCell).getValue();
+  var lastServerStatus = getSheet('Variables').getRange(serverStatusDataCell).getValue();
   var newServerStatus = gameStatus.status;
   return (lastServerStatus != newServerStatus);
 }
 
 function initializeVariables(gameStatus){
   // gameStatus: json; initializes variables sheet
-  var sheet = getSheet(varSheetName);
+  var sheet = getSheet('Variables');
   var serverStatusCell = sheet.getRange(serverStatusDataCell).getValue();
   if(serverStatusCell == ''){
     sheet.getRange(serverStatusDataCell).setValue(gameStatus.status);
@@ -217,11 +216,6 @@ function initializeVariables(gameStatus){
   var chartsCreatedCell = sheet.getRange(chartsCreatedDataCell).getValue();
   if(chartsCreatedCell == ''){
     sheet.getRange(chartsCreatedDataCell).setValue('false');
-  }
-  
-  var lastRowNumberCell = sheet.getRange(lastRowNumberDataCell).getValue();
-  if(lastRowNumberCell == ''){
-    sheet.getRange(lastRowNumberDataCell).setValue(2);
   }
 }
 
@@ -232,6 +226,7 @@ function updateServerMessages(gameStatus){
 }
 
 function initializeSpreadsheet(){
+  // create graphs sheet
   if(!sheetExists('Graphs')){
     createSheet('Graphs');
     var graphsSheet = getSheet('Graphs');
@@ -242,25 +237,25 @@ function initializeSpreadsheet(){
     // set title
     graphsSheet.getRange(titleRange).setValue('Fortnite stats solo and duo');
     // color the backgrounds of ranges
-    graphsSheet.getRange(titleRange).setBackground('#e56030');
-    graphsSheet.getRange(serverStatusRange).setBackground('#e56030');
-    graphsSheet.getRange(serverMessageRange).setBackground('#e56030');
+    graphsSheet.getRange(titleRange).setBackground('#e56030'); // TODO make global variable
+    graphsSheet.getRange(serverStatusRange).setBackground('#e56030'); // TODO make global variable
+    graphsSheet.getRange(serverMessageRange).setBackground('#e56030'); // TODO make global variable
     // color the fonts
-    graphsSheet.getRange(titleRange).setFontColor('white');
-    graphsSheet.getRange(serverStatusRange).setFontColor('white');
-    graphsSheet.getRange(serverMessageRange).setFontColor('white');
+    graphsSheet.getRange(titleRange).setFontColor('white'); // TODO make global variable
+    graphsSheet.getRange(serverStatusRange).setFontColor('white'); // TODO make global variable
+    graphsSheet.getRange(serverMessageRange).setFontColor('white'); // TODO make global variable
     // set font sizes
-    graphsSheet.getRange(titleRange).setFontSize(14);
-    graphsSheet.getRange(serverStatusRange).setFontSize(14);
-    graphsSheet.getRange(serverMessageRange).setFontSize(14);
+    graphsSheet.getRange(titleRange).setFontSize(14); // TODO make global variable
+    graphsSheet.getRange(serverStatusRange).setFontSize(14); // TODO make global variable
+    graphsSheet.getRange(serverMessageRange).setFontSize(14); // TODO make global variable
     // set fonts bold
     graphsSheet.getRange(titleRange).setFontWeight('bold');
     graphsSheet.getRange(serverStatusRange).setFontWeight('bold');
     graphsSheet.getRange(serverMessageRange).setFontWeight('bold');
   }
   // create variables sheet
-  if(!sheetExists(varSheetName)){
-    createSheet(varSheetName);
+  if(!sheetExists('Variables')){
+    createSheet('Variables');
   }
 }
 
@@ -286,23 +281,29 @@ function initializeSheet(sheetName){
   autoResize(sheetName);
 }
 
-function getLastRowNumber(){
-  // sheetName: string; return integer; returns the last row number
-  var sheet = getSheet(varSheetName);
-  var lastRowNumberCell = sheet.getRange(lastRowNumberDataCell).getValue();
-  return(lastRowNumberCell);
+function getLastRowNumber(sheetName){
+  // sheetName: string; return integer; returns the last row number based on column A
+  var sheet = getSheet(sheetName);
+  var column = sheet.getRange('A:A');
+  var values = column.getValues(); // get all data in one call
+  var ct = 0;
+  while (values[ct][0] != "") {
+    ct++;
+  }
+  return (ct);
 }
 
 function getLastValueFromColumn(sheetName, column){
   // returns the last numerical value from a column, otherwise 0; sheetName: string; column: string; returns integer
   var sheet = getSheet(sheetName);
-  var lastRowNumber = getLastRowNumber();
+
+  var lastRowNumber = getLastRowNumber(sheetName);
   try{
-    var lastValue = parseInt(sheet.getRange(column + lastRowNumber.toString()).getValue());
-    if (isNaN(lastValue)){
+    var lastMatches = parseInt(sheet.getRange(column + lastRowNumber.toString()).getValue());
+    if (isNaN(lastMatches)){
       return 0;
     }else{
-      return lastValue;
+      return lastMatches;
     }
   }
   catch(err){
@@ -320,11 +321,6 @@ function getGamestatusJson(){
   var text = response.getContentText();
   var json = JSON.parse(text);
   return(json);
-}
-
-function isServerUp(gameStatus){
-  // gameStatus: json; returns bool
-  return(gameStatus.status == 'UP');
 }
 
 function getResponse(ftname){
@@ -368,54 +364,6 @@ function insertStatsRow(sheetName, json){
   // prepare row
   var row = [newEntry, soloMatches, soloWins, soloWinrate, soloKills, soloKpd, duoMatches, duoWins, duoWinrate, dupKills, duoKpd, time, date];
   sheet.appendRow(row)
-}
-
-function autoResize(sheetName){
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = getSheet(sheetName);
-  sheet.autoResizeColumns(1,8);
-}
-
-function createSheet(sheetName){
-  // sheetName: string; returns bool
-  if(sheetExists(sheetName)){
-    return false;
-  }
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var newSheet = ss.insertSheet();
-  newSheet.setName(sheetName);
-  return true;
-}
-
-function sheetExists(sheetName){
-  // sheetName: string; returns bool
-  var newSheet = getSheet(sheetName);
-  return(newSheet != null);
-}
-
-function isSheetEmpty(sheet) {
-  // sheet: sheet; returns bool
-  return sheet.getDataRange().getValues().join("") === "";
-}
-
-function getSheet(sheetName){
-  // sheetName: string; returns sheet
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(sheetName);
-  return sheet;
-}
-
-function currentDate(){
-  // returns a string 
-  var date = Utilities.formatDate(new Date(), "GMT+2", "dd/MM/yyyy"); // formated date 
-  return date;
-}
-
-function currentTime(){
-  // returns a string
-  var d = new Date();
-  var currentTime = d.toLocaleTimeString().substring(0,11);
-  return currentTime;
 }
 
 function sendChartsToEmails(){
@@ -481,21 +429,67 @@ function sendChartsToEmails(){
   }
 }
 
-function sendDiscordMessage(webhookUrl, message){
-  var data = {
-    'content' : message
+
+function createSheet(sheetName){
+  // sheetName: string; returns bool
+  if(sheetExists(sheetName)){
+    return false;
   }
-  var options = {
-    'method' : 'POST',
-    'headers': {'Content-Type': 'application/json'},
-    'payload': JSON.stringify(data)
-  };
-  UrlFetchApp.fetch(webhookUrl, options);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var newSheet = ss.insertSheet();
+  newSheet.setName(sheetName);
+  return true;
 }
 
-function sendEmail(emailAddress, subject, message){
-  MailApp.sendEmail(emailAddress, subject, message);
+function autoResize(sheetName){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = getSheet(sheetName);
+  sheet.autoResizeColumns(1,8);
 }
+
+function isServerUp(gameStatus){
+  // gameStatus: json; returns bool
+  return(gameStatus.status == 'UP');
+}
+
+function sendChartToDiscord(){
+    for(var i = 0; i < discordWebhookUrls.length; i++){
+      var discordWebhook = discordWebhookUrls[i];
+      sendDiscordMessage(discordWebhook, chartsLink);
+    }
+}
+
+function getSheet(sheetName){
+  // sheetName: string; returns sheet
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  return sheet;
+}
+
+function currentDate(){
+  // returns a string 
+  var date = Utilities.formatDate(new Date(), "GMT+2", "dd/MM/yyyy"); // formated date 
+  return date;
+}
+
+function currentTime(){
+  // returns a string
+  var d = new Date();
+  var currentTime = d.toLocaleTimeString().substring(0,11);
+  return currentTime;
+}
+
+function sheetExists(sheetName){
+  // sheetName: string; returns bool
+  var newSheet = getSheet(sheetName);
+  return(newSheet != null);
+}
+
+function isSheetEmpty(sheet) {
+  // sheet: sheet; returns bool
+  return sheet.getDataRange().getValues().join("") === "";
+}
+
 
 // deprecated functions
 function sendChartsImagesToDiscordWebhooks(){
@@ -522,6 +516,13 @@ function sendChartsImagesToDiscordWebhooks(){
   }
 }
 
+function setupUI(){
+  SpreadsheetApp.getUi()
+  .createMenu('Custom Menu')
+  .addItem('Show alert', 'showAlert')
+  .addToUi();
+}
+
 function showAlert(message1, message2, confirmationMessage) {
   // message1: strng; message2: string; confirmationMessage: string
   var ui = SpreadsheetApp.getUi();
@@ -529,13 +530,6 @@ function showAlert(message1, message2, confirmationMessage) {
   if (result == ui.Button.OK) {
     ui.alert(confirmationMessage);
   }
-}
-
-function setupUI(){
-  SpreadsheetApp.getUi()
-  .createMenu('Custom Menu')
-  .addItem('Show alert', 'showAlert')
-  .addToUi();
 }
 
 function renameSheet(sheetName, newSheetName){
