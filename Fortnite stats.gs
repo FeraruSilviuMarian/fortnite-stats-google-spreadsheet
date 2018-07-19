@@ -388,36 +388,16 @@ function sendChartsToEmails(){
     var template = HtmlService.createTemplateFromFile("graphImage");
     template.date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MM-y");
 
-    // prepare chart images
-    var duoWinrateChart = charts[0];
-    var duoWinrateImgBlob =  duoWinrateChart.getBlob().getAs('image/png').setName("duoWinrateImgBlob");
+    var imageNames = ["duoWinrateImgBlob","duoKpdImgBlob","duoWinsImgBlob","duoKillsImgBlob","duoMatchesImgBlob","soloWinrateImgBlob",
+                      "soloKpdImgBlob","soloWinsImgBlob","soloKillsImgBlob","soloMatchesImgBlob"]
     
-    var duoKpdChart = charts[1];
-    var duoKpdImgBlob =  duoKpdChart.getBlob().getAs('image/png').setName("duoKpdImgBlob");
-    
-    var duoWinsChart = charts[2];
-    var duoWinsImgBlob =  duoWinsChart.getBlob().getAs('image/png').setName("duoWinsImgBlob"); 
-
-    var duoKillsChart = charts[3];
-    var duoKillsImgBlob =  duoKillsChart.getBlob().getAs('image/png').setName("duoKillsImgBlob");
-    
-    var duoMatchesChart = charts[4];
-    var duoMatchesImgBlob =  duoMatchesChart.getBlob().getAs('image/png').setName("duoMatchesImgBlob");
-    
-    var soloWinrateChart = charts[5];
-    var soloWinrateImgBlob =  soloWinrateChart.getBlob().getAs('image/png').setName("soloWinrateImgBlob");
-    
-    var soloKpdChart = charts[6];
-    var soloKpdImgBlob =  soloKpdChart.getBlob().getAs('image/png').setName("soloKpdImgBlob");
-    
-    var soloWinsChart = charts[7];
-    var soloWinsImgBlob =  soloWinsChart.getBlob().getAs('image/png').setName("soloWinsImgBlob");
-
-    var soloKillsChart = charts[8];
-    var soloKillsImgBlob =  soloKillsChart.getBlob().getAs('image/png').setName("soloKillsImgBlob");
-
-    var soloMatchesChart = charts[9];
-    var soloMatchesImgBlob =  soloMatchesChart.getBlob().getAs('image/png').setName("soloMatchesImgBlob");
+    // collect img blobs
+    var imgBlobs = [];
+    for(var i = 0; i < imageNames.length; i++){
+      var chart = charts[i];
+      var imgBlob = chart.getBlob().getAs('image/png').setName(imageNames[i]);
+      imgBlobs.push(imgBlob);
+    }
     
     // send email to list of emails
     for(var i = 0; i < emailAddresses.length; i++){
@@ -427,16 +407,16 @@ function sendChartsToEmails(){
                         subject: "Fortnite stats charts.",
                         htmlBody: template.evaluate().getContent(),
                         inlineImages: {
-                          duoWinrate: duoWinrateImgBlob,
-                          duoKpd: duoKpdImgBlob,
-                          duoWins: duoWinsImgBlob,
-                          duoKills: duoKillsImgBlob,
-                          duoMatches: duoMatchesImgBlob,
-                          soloWinrate: soloWinrateImgBlob,
-                          soloKpd: soloKpdImgBlob,
-                          soloWins: soloWinsImgBlob,
-                          soloKills: soloKillsImgBlob,
-                          soloMatches: soloMatchesImgBlob
+                          duoWinrate: imgBlobs[0],
+                          duoKpd: imgBlobs[1],
+                          duoWins: imgBlobs[2],
+                          duoKills: imgBlobs[3],
+                          duoMatches: imgBlobs[4],
+                          soloWinrate: imgBlobs[5],
+                          soloKpd: imgBlobs[6],
+                          soloWins: imgBlobs[7],
+                          soloKills: imgBlobs[8],
+                          soloMatches: imgBlobs[9]
                         }
                       });
     }
