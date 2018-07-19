@@ -2,18 +2,32 @@
 // Note, optionally you can add sendChartsToEmails() and sendChartToDiscord() as weekly triggers to recieve reports
 // for that you will need to make a webhook from discord, and publish your chart and include it here, it is optional functionality however. 
 
+// REQUIRED CONFIGURATION
 // Add any number of usernames to the "fortniteUsernames" array and add main() as a time-driven trigger (5 minutes would be a good interval).
-var fortniteUsernames = ["your fortnite username", "your friend's fortnite username"];
+var fortniteUsernames = ['your fortnite username', 'another fornite username'];
 // Get an api key by direct messaging @Fortnite Stats on discord, with the message !getapikey  visit https://fortnite.y3n.co/ for more details
-var key = 'your fortnite api key';
+var key = 'your api key';
 // Everything else will be set up automatically.
 
+// OPTIONAL CONFIGURATION
 // if the servers status changes emails will be sent to these addresses, you can add as many as you want
-var emailAddresses = ['email1', 'email2'];
+var emailAddresses = ['some email', 'another email'];
 // Discord webhook urls, a list of discord webhooks / routes, when server status changes, messages will be sent to these webhooks
 var discordWebhookUrls = ['your discord webhook'];
 // optionally you can publish your charts so it can be sent to you on discord as a weekly report for example, add sendChartToDiscord() as a trigger
 var chartsLink = 'your published charts link';
+
+// visual configuration
+var titleBackgroundColor = '#e56030';
+var titleFontColor = 'white';
+var titleFontSize = 14;
+var serverStatusBackgroundColor = '#e56030';
+var serverStatusFontColor = 'white';
+var serverStatusFontSize = 14;
+var serverMessageBackgroundColor = '#e56030';
+var serverMessageFontColor = 'white';
+var serverMessageFontSize = 14;
+
 
 // constants
 var entryColumn = 'A';
@@ -93,15 +107,15 @@ function main(){
     }
   }
   
-  // create special graph sheet if it doesn't exist note this if statement and createSpecialChart function can be removed safely
+  // create SPECIAL GRAPHS sheet if it doesn't exist note this if statement and createSpecialChart function can be removed safely
   // it's used to create special charts for myself, you can do something similar too using your username
   if(!sheetExists('silver_chart')){
     createSheet('silver_chart');
     var specialSheet = getSheet('silver_chart');
     // winrate chart
-    createSpecialChart('D:D', 1, 1, 'Solo Winrate', 1100, 350, 'silver_chart', 'silver_0_wins');
+    createSpecialChart('D:D', 1, 1, 'Solo Winrate', 1150, 380, 'silver_chart', 'silver_0_wins');
     // kpd chart
-    createSpecialChart('F:F', 18, 1, 'Solo Kpd', 1100, 350, 'silver_chart', 'silver_0_wins');
+    createSpecialChart('F:F', 19, 1, 'Solo Kpd', 1150, 380, 'silver_chart', 'silver_0_wins');
   }
   
   initializeCharts(); // create charts if charts don't exist
@@ -237,17 +251,17 @@ function initializeSpreadsheet(){
     // set title
     graphsSheet.getRange(titleRange).setValue('Fortnite stats solo and duo');
     // color the backgrounds of ranges
-    graphsSheet.getRange(titleRange).setBackground('#e56030'); // TODO make global variable
-    graphsSheet.getRange(serverStatusRange).setBackground('#e56030'); // TODO make global variable
-    graphsSheet.getRange(serverMessageRange).setBackground('#e56030'); // TODO make global variable
+    graphsSheet.getRange(titleRange).setBackground(titleBackgroundColor);
+    graphsSheet.getRange(serverStatusRange).setBackground(serverStatusBackgroundColor);
+    graphsSheet.getRange(serverMessageRange).setBackground(serverMessageBackgroundColor);
     // color the fonts
-    graphsSheet.getRange(titleRange).setFontColor('white'); // TODO make global variable
-    graphsSheet.getRange(serverStatusRange).setFontColor('white'); // TODO make global variable
-    graphsSheet.getRange(serverMessageRange).setFontColor('white'); // TODO make global variable
+    graphsSheet.getRange(titleRange).setFontColor(titleFontColor);
+    graphsSheet.getRange(serverStatusRange).setFontColor(serverStatusFontColor);
+    graphsSheet.getRange(serverMessageRange).setFontColor(serverMessageFontColor);
     // set font sizes
-    graphsSheet.getRange(titleRange).setFontSize(14); // TODO make global variable
-    graphsSheet.getRange(serverStatusRange).setFontSize(14); // TODO make global variable
-    graphsSheet.getRange(serverMessageRange).setFontSize(14); // TODO make global variable
+    graphsSheet.getRange(titleRange).setFontSize(titleFontSize);
+    graphsSheet.getRange(serverStatusRange).setFontSize(serverStatusFontSize);
+    graphsSheet.getRange(serverMessageRange).setFontSize(serverMessageFontSize);
     // set fonts bold
     graphsSheet.getRange(titleRange).setFontWeight('bold');
     graphsSheet.getRange(serverStatusRange).setFontWeight('bold');
@@ -495,24 +509,19 @@ function isSheetEmpty(sheet) {
 function sendChartsImagesToDiscordWebhooks(){
   var sheet = getSheet('Graphs');
   var charts = sheet.getCharts();
+  var imageNames = ["duoWinrateImg", 'duoKpdImg'];
   
-  // prepare chart images urls
-  var duoWinrateChart = charts[0];
-  var duoWinrateImgBlob =  duoWinrateChart.getBlob().getAs('image/png').setName("duoWinrateImg");
-  var duoWinrateFile = DriveApp.createFile(duoWinrateImgBlob);
-  duoWinrateFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); // make public
-  var duoWinrateFileUrl = duoWinrateFile.getUrl();
-
-  var duoKpdChart = charts[1];
-  var duoKpdImgBlob =  duoKpdChart.getBlob().getAs('image/png').setName("duoKpdImg");
-  var duoKpdFile = DriveApp.createFile(duoKpdImgBlob);
-  duoKpdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); // make public
-  var duoKpdFileUrl = duoKpdFile.getUrl();
-  
-  for(var i = 0; i < discordWebhookUrls.length; i++){
-    var discordWebhook = discordWebhookUrls[i];
-    sendDiscordMessage(discordWebhook, duoWinrateFileUrl);
-    sendDiscordMessage(discordWebhook, duoKpdFileUrl);
+  for(var i = 0; i < imageNames.length; i++){
+    var chart = charts[i];
+    var imgBlob = chart.getBlob().getAs('image/png').setName(imageNames[i]);
+    var file = DriveApp.createFile(imgBlob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); // make public
+    fileUrl = file.getUrl();
+    
+    for(var i = 0; i < discordWebhookUrls.length; i++){
+      var discordWebhook = discordWebhookUrls[i];
+      sendDiscordMessage(discordWebhook, fileUrl);
+    }
   }
 }
 
@@ -540,3 +549,5 @@ function renameSheet(sheetName, newSheetName){
     Logger.log('Error trying to rename sheet ' + sheetName + ', sheet does not exists.');
   }
 }
+
+// debugging functions
